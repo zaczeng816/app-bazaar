@@ -5,7 +5,7 @@ type App struct {
 	User        string `json:"user"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
-	Price       string `json:"price"`
+	Price       int    `json:"price"`
 	Url         string `json:"url"`
 	ProductID   string `json:"product_id"`
 	PriceID     string `json:"price_id"`
