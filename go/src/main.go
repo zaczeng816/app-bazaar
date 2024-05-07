@@ -5,15 +5,13 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/joho/godotenv"
-
 	"app-bazaar/backend"
 	"app-bazaar/constants"
 	"app-bazaar/handler"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if err := constants.LoadEnv(); err != nil {
         log.Println("No .env file found")
     }
 
