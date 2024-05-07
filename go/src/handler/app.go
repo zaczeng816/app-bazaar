@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"app-bazaar/model"
+	"app-bazaar/service"
 )
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,3 +21,26 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received a search request")
+	w.Header().Set("Content-Type", "application/json")
+	title := r.URL.Query().Get("title")
+	description := r.URL.Query().Get("description")
+
+	var apps []model.App 
+	var err error
+	apps, err = service.SearchApps(title, description)
+	if err != nil{
+		http.Error(w, "Fail to read Apps from backend", http.StatusInternalServerError)
+		return 
+	}
+	
+	js, err := json.Marshal(apps)
+	if err != nil{
+		http.Error(w, "Failed to fail Apps into JSON", http.StatusInternalServerError)
+	}
+	w.Write(js)
+}
+
+
