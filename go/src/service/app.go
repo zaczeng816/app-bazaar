@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -9,6 +10,7 @@ import (
 	"app-bazaar/model"
 
 	"github.com/olivere/elastic/v7"
+	"github.com/stripe/stripe-go/v78"
 )
 
 // SEARCH APPS
@@ -59,7 +61,7 @@ func SearchAppsByDescription(description string) ([]model.App, error){
 	return getAppFromSearchResult(searchResult), nil
 }
 
-func SearchAppsById(appID string) (*model.App, error){
+func SearchAppsByID(appID string) (*model.App, error){
 	query := elastic.NewTermQuery("id", appID)
 	searchResult, err := backend.ESBackend.ReadFromES(query, constants.APP_INDEX)
 	if err != nil{
@@ -94,4 +96,18 @@ func SaveApp(app *model.App) error{
 	app.PriceID = priceID
 	fmt.Printf("Product and price created with: %v, %v\n", productID, priceID)
 	return nil
+}
+
+// CHECKOUT APP
+
+func CheckoutApp(domain string, appID string)(*stripe.CheckoutSession, error){
+	app, err := SearchAppsByID(appID)
+	if err != nil{
+		return nil, err
+	}
+	if app == nil{
+		return nil, errors.New("app not found")
+	}
+	fmt.Println(app.PriceID)
+	return backend.CreateCheckoutSession(domain, app.PriceID)
 }
