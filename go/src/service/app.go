@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"reflect"
 
 	"app-bazaar/backend"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/olivere/elastic/v7"
 )
+
+// SEARCH APPS
 
 func SearchApps(title string, description string) ([]model.App, error){
 	if title == "" {
@@ -77,4 +80,18 @@ func getAppFromSearchResult(searchResult *elastic.SearchResult) []model.App{
 		apps = append(apps, p)
 	}
 	return apps
+}
+
+// SAVE
+
+func SaveApp(app *model.App) error{
+	productID, priceID, err := backend.CreateProductWithPrice(app.Title, app.Description, int64(app.Price*100))
+	if err != nil{
+		fmt.Printf("Failed to create product and price for app %v: %v\n", app.Title, err)
+		return err
+	}
+	app.ProductID = productID
+	app.PriceID = priceID
+	fmt.Printf("Product and price created with: %v, %v\n", productID, priceID)
+	return nil
 }

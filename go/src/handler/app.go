@@ -16,7 +16,8 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	if err := decoder.Decode(&app); err != nil {
 		panic(err)
 	}
-	_, err := fmt.Fprintf(w, "Upload request received: %s\n", app.Description)
+	service.SaveApp(&app)
+	_, err := fmt.Fprintf(w, "Upload request processed: %s\n", app.Description)
 	if err != nil {
 		return
 	}
@@ -42,5 +43,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(js)
 }
+
 
 
