@@ -14,7 +14,8 @@ var (
     ES_USERNAME     string
     ES_PASSWORD     string
     STRIPE_API_KEY  string
-    STRIPE_CHECKOUT_SESSION_API string
+    STRIPE_CHECKOUT_SESSION_URL string
+    GCS_BUCKET string
 )
 
 func getEnv(key, defaultValue string) string {
@@ -36,6 +37,7 @@ func LoadEnv() error {
     ES_PASSWORD = getEnv("ES_PASSWORD", "")
     SERVER_PORT = getEnv("SERVER_PORT", ":8080")
     STRIPE_API_KEY = getEnv("STRIPE_API_KEY", "sk_test_4eC39HqLyjWDarjtT1zdp7dc")
-    STRIPE_CHECKOUT_SESSION_API = getEnv("STRIPE_CHECKOUT_SESSION_API", "http://localhost:4242")
+    STRIPE_CHECKOUT_SESSION_URL = getEnv("STRIPE_CHECKOUT_SESSION_URL", "http://localhost:4242")
+    GCS_BUCKET = getEnv("GCS_BUCKET", "zac-main-")
     return nil
 }
