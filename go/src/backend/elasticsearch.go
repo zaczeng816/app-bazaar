@@ -84,3 +84,17 @@ func InitElasticBackend(){
 	ESBackend = &ElasticsearchBackend{client: client}
 
 }
+
+func (es *ElasticsearchBackend) ReadFromES(query elastic.Query, index string) (*elastic.SearchResult, error){
+	searchResult, err := es.client.Search().
+		Index(index).
+		Query(query).
+		Do(context.Background())
+
+	if err != nil{
+		return nil, err
+	}
+
+	return searchResult, nil
+
+}
