@@ -18,9 +18,14 @@ type ElasticsearchBackend struct{
 }
 
 func InitElasticBackend(){
+
+	ES_URL      := constants.GetEnv("ES_URL", "http://localhost:9200")
+    ES_USERNAME := constants.GetEnv("ES_USERNAME", "admin")
+    ES_PASSWORD := constants.GetEnv("ES_PASSWORD", "")
+
 	client, err := elastic.NewClient(
-		elastic.SetURL(constants.ES_URL),
-		elastic.SetBasicAuth(constants.ES_USERNAME, constants.ES_PASSWORD))
+		elastic.SetURL(ES_URL),
+		elastic.SetBasicAuth(ES_USERNAME, ES_PASSWORD))
 
 	if err != nil{
 		panic(err)
