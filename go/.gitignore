@@ -24,3 +24,6 @@ go.work
 
 # Environment variables file
 .env
+
+# Ignore deploy.yml in conf/
+/src/conf/deploy.yml
