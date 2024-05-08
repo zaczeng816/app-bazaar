@@ -8,29 +8,30 @@ import (
 	"net/http"
 	"strconv"
 
+	jwt "github.com/form3tech-oss/jwt-go"
+	"github.com/gorilla/mux"
 	"github.com/pborman/uuid"
 )
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received a upload request")
-	// decoder := json.NewDecoder(r.Body)
-	// var app model.App
-	// if err := decoder.Decode(&app); err != nil {
-	// 	panic(err)
-	// }
+
+	token := r.Context().Value("user")
+	claims := token.(*jwt.Token).Claims
+	username := claims.(jwt.MapClaims)["username"]
+	
 	app := model.App{
 		Id: uuid.New(),
-		User: r.FormValue("user"),
+		User: username.(string),
 		Title: r.FormValue("title"),
 		Description: r.FormValue("description"),
 	}
 
 	price, err := strconv.Atoi(r.FormValue("price"))
-	app.Price = price
-	fmt.Printf("%v, %T", price, price)
 	if err != nil {
 		fmt.Println(err)
 	}
+	app.Price = int(price * 100.0)
 	file, _, err := r.FormFile("media_file")
 	if err != nil {
 		http.Error(w, "Media file is not available", http.StatusBadRequest)
@@ -45,7 +46,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("App successfully saved to backend")
-	
+
 	fmt.Fprintf(w, "App was saved successfully %s\n", app.Description)
 }
 
@@ -86,4 +87,22 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(s.URL))
 
 	fmt.Println("Checkout process started!")
+}
+
+func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received a delete request")
+	
+	user := r.Context().Value("user")
+	claims := user.(*jwt.Token).Claims
+	username := claims.(jwt.MapClaims)["username"].(string)
+	id := mux.Vars(r)["id"]
+
+	if err := service.DeleteApp(id, username); err != nil{
+		http.Error(w, "Failed to delete app", http.StatusInternalServerError)
+		fmt.Printf("Failed to delete app %v\n", err)
+		return
+	}
+	
+	fmt.Fprint(w, "App was deleted successfully")
+	fmt.Println("App was deleted successfully")
 }
