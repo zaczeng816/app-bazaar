@@ -1,26 +1,52 @@
 package handler
 
 import (
+	"app-bazaar/model"
+	"app-bazaar/service"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
-	"app-bazaar/model"
-	"app-bazaar/service"
+	"github.com/pborman/uuid"
 )
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received a upload request")
-	decoder := json.NewDecoder(r.Body)
-	var app model.App
-	if err := decoder.Decode(&app); err != nil {
-		panic(err)
+	// decoder := json.NewDecoder(r.Body)
+	// var app model.App
+	// if err := decoder.Decode(&app); err != nil {
+	// 	panic(err)
+	// }
+	app := model.App{
+		Id: uuid.New(),
+		User: r.FormValue("user"),
+		Title: r.FormValue("title"),
+		Description: r.FormValue("description"),
 	}
-	service.SaveApp(&app)
-	_, err := fmt.Fprintf(w, "Upload request processed: %s\n", app.Description)
+
+	price, err := strconv.Atoi(r.FormValue("price"))
+	app.Price = price
+	fmt.Printf("%v, %T", price, price)
 	if err != nil {
+		fmt.Println(err)
+	}
+	file, _, err := r.FormFile("media_file")
+	if err != nil {
+		http.Error(w, "Media file is not available", http.StatusBadRequest)
+		fmt.Printf("Media file is not available %v\n", err)	
+		return
+	} 
+
+	err = service.SaveApp(&app, file)
+	if err != nil {
+		http.Error(w, "Failed to save app to backend", http.StatusInternalServerError)
+		fmt.Printf("Failed to save app to backend %v\n", err)	
 		return
 	}
+	fmt.Println("App successfully saved to backend")
+	
+	fmt.Fprintf(w, "App was saved successfully %s\n", app.Description)
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {

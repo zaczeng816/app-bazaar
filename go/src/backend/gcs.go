@@ -1,11 +1,12 @@
 package backend
 
-import(
+import (
 	"context"
 	"fmt"
 	"io"
 
 	"app-bazaar/constants"
+
 	"cloud.google.com/go/storage"
 )
 
@@ -37,7 +38,7 @@ func (backend *GoogleCloudStorageBackend) SaveToGCS(r io.Reader, objectName stri
 	object := backend.client.Bucket(backend.bucket).Object(objectName)
 	wc := object.NewWriter(ctx)
 	if _, err := io.Copy(wc, r); err != nil {
-		retunr "", err
+		return "", err
 	}
 
 	if err := wc.Close(); err != nil {

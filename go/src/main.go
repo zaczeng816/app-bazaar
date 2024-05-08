@@ -17,6 +17,7 @@ func main() {
 
 	fmt.Println("Server started")
 
+	backend.InitGCSBackend()
 	backend.InitElasticBackend()
 
 	log.Fatal(http.ListenAndServe(constants.SERVER_PORT, handler.InitRouter()))

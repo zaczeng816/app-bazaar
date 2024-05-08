@@ -1,13 +1,13 @@
 package service
 
 import (
-	"errors"
-	"fmt"
-	"reflect"
-
 	"app-bazaar/backend"
 	"app-bazaar/constants"
 	"app-bazaar/model"
+	"errors"
+	"fmt"
+	"mime/multipart"
+	"reflect"
 
 	"github.com/olivere/elastic/v7"
 	"github.com/stripe/stripe-go/v78"
@@ -86,7 +86,7 @@ func getAppFromSearchResult(searchResult *elastic.SearchResult) []model.App{
 
 // SAVE
 
-func SaveApp(app *model.App) error{
+func SaveApp(app *model.App, file multipart.File) error{
 	productID, priceID, err := backend.CreateProductWithPrice(app.Title, app.Description, int64(app.Price*100))
 	if err != nil{
 		fmt.Printf("Failed to create product and price for app %v: %v\n", app.Title, err)
@@ -95,6 +95,20 @@ func SaveApp(app *model.App) error{
 	app.ProductID = productID
 	app.PriceID = priceID
 	fmt.Printf("Product and price created with: %v, %v\n", productID, priceID)
+
+	mediaLink, err := backend.GCSBackend.SaveToGCS(file, app.Id)
+	if err != nil {
+		return err
+	}
+	app.Url = mediaLink
+
+	err = backend.ESBackend.SaveToES(app, constants.APP_INDEX, app.Id)
+	if err != nil{
+		fmt.Printf("Failed to save app to ES: %v\n", err)
+		return err
+	}
+
+	fmt.Println("App saved to ES")
 	return nil
 }
 
