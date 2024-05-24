@@ -31,7 +31,7 @@ jwtMiddleware.Handler(http.HandlerFunc(deleteHandler))).Methods("DELETE")
 	router.Handle("/signin", http.HandlerFunc(signinHandler)).Methods("POST")
 
 	originsOk := handlers.AllowedOrigins([]string{"*"})
-	headersOk := handlers.AllowedHeaders([]string{ "Content-Type", "Authorization"})
+	headersOk := handlers.AllowedHeaders([]string{ "Authorization", "Content-Type"})
 	methodsOk := handlers.AllowedMethods([]string{"GET", "POST", "DELETE"})
 	return handlers.CORS(originsOk, headersOk, methodsOk)(router)
 }
