@@ -14,6 +14,13 @@ const App = () => {
         setAuthed(authToken !== null);
     }, []);
 
+    useEffect(() => {
+        const query = new URLSearchParams(window.location.search);
+        if (query.get("success")) {
+            message.success("Checkout success");
+        }
+    }, []);
+
     const handleLoginSuccess = () => {
         setAuthed(true);
     };
